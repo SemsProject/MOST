@@ -1,6 +1,5 @@
 function initialiseChoiceChart ()
 {
-	queryUrl(callVis, clickDiff, showBivesTab);
     var counts = {};
     originalDiffstats.forEach(function(r) {
         var datum = originalFilestats[ r["model"] + r["version2id"]  ].date;
@@ -25,6 +24,11 @@ function initialiseChoiceChart ()
 
     var minVersion2 = d3.min(data, function (d){ return d.datum });
     var maxVersion2 = d3.max(data, function (d){ return d.datum });
+
+    // document.getElementById("date1").setAttribute("min", minVersion2);
+    // document.getElementById("date1").setAttribute("max", maxVersion2);
+    // document.getElementById("date2").setAttribute("min", minVersion2);
+    // document.getElementById("date2").setAttribute("max", maxVersion2);
 
 
 
@@ -99,7 +103,7 @@ function initialiseChoiceChart ()
 
 	$("#choiceChartChartProperties").hide ();
 
-	var repoEvo = repoEvolution["ALL"]; var width = timewidth + 35; var height = timeheight
+	var repoEvo = repoEvolution["ALL"]; var width = timewidth + 35; var height = timeheight;
 
 	data = repoEvo.values;
 
@@ -243,7 +247,8 @@ function initialiseChoiceChart ()
 
     var brush2 = d3.svg.brush()
         .x(x2)
-        .extent([date1, date2])
+        .extent(window.extent)
+        //[date1, date2])
         .on("brush", brushmove2)
         .on("brushend", brushend2);
 
@@ -256,28 +261,10 @@ function initialiseChoiceChart ()
 	date1 = new Date(document.getElementById("date1").value);
 	date2 = moment(document.getElementById("date2").value);
 
-	brush.extent([date1, date2]);
+	brush.extent(window.extent);
+  brush2.extent(window.extent);
+	//brush.extent([date1, date2]);
 
-/*	var date1Up = document.getElementById("date1Up");
-	date1Up.onmouseup = function(){ hold = 0; applyFilters ();};
-	date1Up.onmouseout = function(){ hold = 0;};
-	date1Up.onmousedown = function () { wait = 1; hold = -1; holdit("date1", "up");};
-
-	var date1Down = document.getElementById("date1Down");
-	date1Down.onmouseup = function(){ hold = 0; applyFilters ();};
-	date1Down.onmouseout = function(){ hold = 0;};
-	date1Down.onmousedown = function () { wait = 1; hold = -1; holdit("date1", "down");};
-
-	var date2Up = document.getElementById("date2Up");
-	date2Up.onmouseup = function(){ hold = 0; applyFilters ();};
-	date2Up.onmouseout = function(){ hold = 0;};
-	date2Up.onmousedown = function () { wait = 1; hold = -1; holdit("date2", "up");};
-
-	var date2Down = document.getElementById("date2Down");
-	date2Down.onmouseup = function(){ hold = 0; applyFilters ();};
-	date2Down.onmouseout = function(){ hold = 0;};
-	date2Down.onmousedown = function () { wait = 1; hold = -1; holdit("date2", "down");};
-*/
 	$("#choiceProperties").click (function (){
 		$("#choiceProperties").attr("class","btn-changes-on");
 		$("#choiceChanges").attr("class","btn-changes-off");
@@ -285,85 +272,11 @@ function initialiseChoiceChart ()
 		$("#choiceChartChartChanges").hide();
 	});
 
-/*    function holdit(btn, mode) {
-        if (hold == -1 && wait == 1){
-            setTimeout(function(){
-                wait = 0;
-                if(mode === "up"){
-                    var newDate = new Date(document.getElementById(btn).value).add(1, 'd');
-                    document.getElementById(btn).value = new Date(newDate).toISOString().slice(0,10);
-                    if(btn == "date2"){
-						brush.extent([date1, newDate]);
-                        brush2.extent([date1, newDate]);
-                        date2 = newDate;
-                    } else {
-						brush.extent([newDate, date2]);
-                        brush2.extent([newDate, date2]);
-                        date1 = newDate;
-                    }
-                    extent = brush2.extent();
-                    brushed();
-                } else {
-                    var newDate = new Date(document.getElementById(btn).value).add(-1, 'days');
-                    document.getElementById(btn).value = new Date(newDate).toISOString().slice(0,10);
-                    if(btn == "date2"){
-						brush.extent([date1, newDate]);
-                        brush2.extent([date1, newDate]);
-                        date2 = newDate;
-                    } else {
-						brush.extent([newDate, date2]);
-                        brush2.extent([newDate, date2]);
-                        date1 = newDate;
-                    }
-                    extent = brush2.extent();
-                    brushed();
-                }
-
-                holdit(btn, mode);
-            }, 300);
-        } else if (hold == -1){
-            setTimeout(function(){
-                wait = 0;
-                if(mode === "up"){
-                    var newDate = new Date(document.getElementById(btn).value).add(1, 'd');
-                    document.getElementById(btn).value = new Date(newDate).toISOString().slice(0,10);
-                    if(btn == "date2"){
-						brush.extent([date1, newDate]);
-                        brush2.extent([date1, newDate]);
-                        date2 = newDate;
-                    } else {
-						brush.extent([newDate, date2]);
-                        brush2.extent([newDate, date2]);
-                        date1 = newDate;
-                    }
-                    extent = brush2.extent();
-                    brushed();
-                } else {
-                    var newDate = new Date(document.getElementById(btn).value).add(-1, 'days');
-                    document.getElementById(btn).value = new Date(newDate).toISOString().slice(0,10);
-                    if(btn == "date2"){
-						brush.extent([date1, newDate]);
-                        brush2.extent([date1, newDate]);
-                        date2 = newDate;
-                    } else {
-						brush.extent([newDate, date2]);
-                        brush2.extent([newDate, date2]);
-                        date1 = newDate;
-                    }
-                    extent = brush2.extent();
-                    brushed();
-                }
-
-                holdit(btn, mode);
-            }, 1);
-        }
-    };
-*/
 
 	function brushed() {
 		svg.select(".brush").call(brush);
-        svg2.select(".brush").call(brush2);
-    }
+    svg2.select(".brush").call(brush2);
+  }
 
 	 function brushmove() {
         extent = brush.extent();
@@ -379,6 +292,7 @@ function initialiseChoiceChart ()
 
     function brushmove2() {
         extent = brush2.extent();
+        console.log ("brushmove2: " + date1 + " -- " + date2)
         date1 = new Date(window.extent[0]);
         date2 = new Date(window.extent[1]);
         document.getElementById("date1").value = date1.toISOString().slice(0,10);
@@ -390,7 +304,8 @@ function initialiseChoiceChart ()
     }
 
     function brushend() {
-		brush2.extent([date1, date2]);
+		brush2.extent(window.extent);
+        //[date1, date2]);
 		svg.select(".brush").call(brush);
         svg2.select(".brush").call(brush2);
         extent = brush.extent();
@@ -398,7 +313,8 @@ function initialiseChoiceChart ()
 	}
 
     function brushend2() {
-		brush.extent([date1, date2]);
+		brush.extent(window.extent);
+        //[date1, date2]);
 		svg.select(".brush").call(brush);
         svg2.select(".brush").call(brush2);
         extent = brush2.extent();
@@ -413,4 +329,31 @@ function initialiseChoiceChart ()
 		$("#choiceChartChartChanges").show ();
 		$("#choiceChartChartProperties").hide ();
 	});
+
+	queryUrl(callVis, clickDiff, showBivesTab, brushed, brush, brush2);
+
+  $("#date1").change(function(){handleDateChange()});
+  $("#date2").change(function(){handleDateChange()});
+
+  // $('input[type="date"]').change(function(){
+  //       alert(this.value);         //Date in full format alert(new Date(this.value));
+  //       var inputDate = new Date(this.value);
+  //   });
+
+  function handleDateChange(){
+    //window.extent = [new Date(date1), new Date(date2)];
+    //brushmove();
+  //  window.extent[0] = $('#date1').value;
+    window.extent[0] = new Date(document.getElementById('date1').value);
+  //  window.extent[1] = $('#date2').value;
+    window.extent[1] = new Date(document.getElementById('date2').value);
+    brush.extent(window.extent);
+    brush2.extent(window.extent);
+    console.log("handler");
+    console.log(window.extent);
+    console.log(brush.extent());
+
+    brushed();
+  }
+
 }
